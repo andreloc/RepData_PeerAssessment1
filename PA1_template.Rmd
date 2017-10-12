@@ -5,18 +5,39 @@ output:
     keep_md: true
 ---
 
+## Loading basic dependencies
+```{r echo=TRUE}
+if (!require("ggplot2")) install.packages("ggplot2")
+if (!require("dplyr")) install.packages("dplyr")
+library("dplyr")
+library("ggplot2")
+```
 
 ## Loading and preprocessing the data
-
-
+```{r echo=TRUE}
+unzip(zipfile = "activity.zip")
+activity <- read.csv(file = "activity.csv")
+```
 
 ## What is mean total number of steps taken per day?
+```{r}
+daily.summary <- activity %>% group_by(date) %>% 
+                            summarise(total.steps = sum(steps,na.rm = T))
+ggplot(data=daily.summary, aes(total.steps)) + geom_histogram() 
+```
 
-
+The average number of steps taken daily is `r round(mean(daily.summary$total.steps))`.
 
 ## What is the average daily activity pattern?
+```{r echo=TRUE}
+interval.summary <- activity %>% group_by(interval) %>% 
+                              summarise(avg.steps = mean(steps, na.rm = T)) %>% 
+                              arrange(desc(avg.steps))
 
+ggplot(data= interval.summary, aes(interval, avg.steps)) + geom_line()
+```
 
+The interval in the day `r head(interval.summary$interval,1)`.
 
 ## Imputing missing values
 
