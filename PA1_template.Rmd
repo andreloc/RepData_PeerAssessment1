@@ -26,7 +26,20 @@ activity <- read.csv(file = "activity.csv", colClasses = c("numeric", "Date", "i
 ```{r echo = T}
 daily.summary <- activity %>% group_by(date) %>% 
                             summarise(total.steps = sum(steps, na.rm = T))
-ggplot(data=daily.summary, aes(total.steps)) + geom_histogram() 
+
+PlotSteps <- function(summary) {
+  ggplot(data = summary, aes(total.steps)) + geom_histogram(breaks = seq(0, 21194, by = 500), 
+                 col="red", 
+                 fill="green", 
+                 alpha = .2) + 
+  labs(title="Histogram for Total Steps") +
+  labs(x="Total Steps", y="Occurrences")
+}
+
+PlotSteps(daily.summary)
+```
+
+```{r echo = T}
 daily.summary.avg <- as.integer(round(mean(daily.summary$total.steps)))
 daily.summary.median <- as.integer(median(daily.summary$total.steps))
 ```
@@ -83,12 +96,15 @@ report the mean and median total number of steps taken per day.
 ```{r echo = T}
 clean.daily.summary <- clean.activity %>% group_by(date) %>% 
                             summarise(total.steps = sum(steps, na.rm = T))
-ggplot(data = daily.summary, aes(total.steps)) + geom_histogram() 
+
+PlotSteps(clean.daily.summary)
+```
+
+```{r echo = T}
 clean.daily.summary.avg <- as.integer(round(mean(clean.daily.summary$total.steps)))
 clean.daily.summary.median <- as.integer(median(clean.daily.summary$total.steps))
 
 ```
-
 
 ### The average number of steps taken daily is `r clean.daily.summary.avg` and the median is `r clean.daily.summary.median`.
 

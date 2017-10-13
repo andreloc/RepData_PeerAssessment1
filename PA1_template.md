@@ -3,7 +3,11 @@
 ## Loading basic dependencies
 
 ```r
-if (!require("ggplot2")) install.packages("ggplot2")
+LoadLibrary <- function(lib){
+  if (!require(lib, character.only = TRUE)) install.packages(lib)
+  library(lib, character.only = TRUE)
+}
+LoadLibrary("ggplot2")
 ```
 
 ```
@@ -11,7 +15,7 @@ if (!require("ggplot2")) install.packages("ggplot2")
 ```
 
 ```r
-if (!require("dplyr")) install.packages("dplyr")
+LoadLibrary("dplyr")
 ```
 
 ```
@@ -40,7 +44,7 @@ if (!require("dplyr")) install.packages("dplyr")
 ```
 
 ```r
-if (!require("gridExtra")) install.packages("gridExtra")
+LoadLibrary("gridExtra")
 ```
 
 ```
@@ -58,12 +62,6 @@ if (!require("gridExtra")) install.packages("gridExtra")
 ##     combine
 ```
 
-```r
-library("dplyr")
-library("ggplot2")
-library("gridExtra")
-```
-
 ## Loading and preprocessing the data
 
 ```r
@@ -76,14 +74,21 @@ activity <- read.csv(file = "activity.csv", colClasses = c("numeric", "Date", "i
 ```r
 daily.summary <- activity %>% group_by(date) %>% 
                             summarise(total.steps = sum(steps, na.rm = T))
-ggplot(data=daily.summary, aes(total.steps)) + geom_histogram() 
-```
 
-```
-## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+PlotSteps <- function(summary) {
+  ggplot(data = summary, aes(total.steps)) + geom_histogram(breaks = seq(0, 21194, by = 500), 
+                 col="red", 
+                 fill="green", 
+                 alpha = .2) + 
+  labs(title="Histogram for Total Steps") +
+  labs(x="Total Steps", y="Occurrences")
+}
+
+PlotSteps(daily.summary)
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
 
 ```r
 daily.summary.avg <- as.integer(round(mean(daily.summary$total.steps)))
@@ -106,7 +111,7 @@ ggplot(data = interval.summary, aes(x=interval, y=avg.steps)) +
   xlab("Interval") + ylab("Average Steps")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 ### The interval in the day 835.
 
@@ -146,20 +151,17 @@ report the mean and median total number of steps taken per day.
 ```r
 clean.daily.summary <- clean.activity %>% group_by(date) %>% 
                             summarise(total.steps = sum(steps, na.rm = T))
-ggplot(data = daily.summary, aes(total.steps)) + geom_histogram() 
+
+PlotSteps(clean.daily.summary)
 ```
 
-```
-## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-```
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
-![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 ```r
 clean.daily.summary.avg <- as.integer(round(mean(clean.daily.summary$total.steps)))
 clean.daily.summary.median <- as.integer(median(clean.daily.summary$total.steps))
 ```
-
 
 ### The average number of steps taken daily is 10766 and the median is 10762.
 
@@ -196,4 +198,4 @@ plot.weekend <- ggplot(data = interval.summary.weekend, aes(x=interval, y=avg.st
 grid.arrange(plot.weekday, plot.weekend, nrow = 2)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
